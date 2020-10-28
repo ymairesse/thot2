@@ -254,7 +254,7 @@ class Files
     {
         $liste = array();
         foreach ($listeDocs as $fileId => $dataDoc) {
-            $nomCours = preg_replace("/[^a-zA-Z]/", "", $dataDoc['libelle']);
+            $nomCours = preg_replace("/[^a-zA-Z] /", "", $dataDoc['libelle']);
             $liste[$nomCours][$fileId] = $dataDoc;
         }
         ksort($liste);
