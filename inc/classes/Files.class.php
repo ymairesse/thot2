@@ -239,7 +239,7 @@ class Files
             }
         }
         Application::DeconnexionPDO($connexion);
-    
+
     return $liste;
     }
 
@@ -254,7 +254,7 @@ class Files
     {
         $liste = array();
         foreach ($listeDocs as $fileId => $dataDoc) {
-            $nomCours = str_replace('.','-', $dataDoc['libelle']);
+            $nomCours = preg_replace("/[^a-zA-Z]/", "", $dataDoc['libelle']);
             $liste[$nomCours][$fileId] = $dataDoc;
         }
         ksort($liste);
