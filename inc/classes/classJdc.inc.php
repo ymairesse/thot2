@@ -22,7 +22,7 @@ class Jdc
      *
      * @return array
      */
-    public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCou    rsString, $redacteur=Null)
+    public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString, $redacteur=Null)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, enonce, class, allDay, startDate, endD    ate ';
