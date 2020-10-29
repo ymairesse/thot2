@@ -5,7 +5,7 @@
  */
 class ThotForum
 {
-	
+
 	CONST acceptedTags = "<a><b><i><u><span><iframe><img><div><table><tbody><tr><td><ul><li><br><p><strike><pre><h1><h2><pre><blockquote><sub><sup>";
 
     function __construct()
@@ -46,7 +46,7 @@ class ThotForum
         $sql .= 'JOIN '.PFX.'thotForums AS forums ON forums.idCategorie = access.idCategorie ';
         $sql .= 'JOIN '.PFX.'thotForumsSujets AS sujets ON sujets.idCategorie = access.idCategorie AND sujets.idSujet = access.idSujet ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = sujets.acronyme ';
-        $sql .= 'WHERE userStatus = "eleves" AND cible IN ("all", :matricule, :classe, :niveau, '.$listeMatieresString.','.$listeCoursGrpString.') ';
+		$sql .= 'WHERE userStatus = "eleves" AND cible IN ("all", :matricule, :classe, "$niveau", '.$listeMatieresString.','.$listeCoursGrpString.') ';
         $sql .= 'AND forumActif = 1 ';
         $sql .= 'ORDER BY cible ';
 
@@ -477,6 +477,132 @@ class ThotForum
 
         return $postId;
     }
+
+	/**
+	 * Enregistre la prise d'abonnement par l'utilisateur $acronyme au $idSujet dans $idCategorie
+	 *
+	 * @param string $acronyme
+	 * @param int $idCatgorie
+	 * @param int $idSujet
+	 *
+	 * @return int
+	 */
+	 public function setAbonnement($matricule, $idCategorie, $idSujet){
+		 $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		 $sql = 'INSERT IGNORE INTO '.PFX.'thotForumsSubscribe ';
+		 $sql .= 'SET user = :matricule, idCategorie = :idCategorie, idSujet = :idSujet ';
+		 $requete = $connexion->prepare($sql);
+
+		 $requete->bindParam(':matricule', $matricule, PDO::PARAM_STR, 7);
+		 $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+		 $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+
+		 $resultat = $requete->execute();
+
+		 $nb = $requete->rowCount();
+
+		 Application::deconnexionPDO($connexion);
+
+		 return $nb;
+	 }
+
+	 /**
+	  * Vérifie la prise d'abonnement par l'utilisateur $acronyme au $idSujet dans $idCategorie
+	  *
+	  * @param string $acronyme
+	  * @param int $idCatgorie
+	  * @param int $idSujet
+	  *
+	  * @return int : 0 ou 1 (abonnement existe)
+	  */
+	  public function getAbonnement($matricule, $idCategorie, $idSujet){
+		  $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		  $sql = 'SELECT user FROM '.PFX.'thotForumsSubscribe ';
+		  $sql .= 'WHERE user = :matricule AND idCategorie = :idCategorie AND idSujet = :idSujet ';
+		  $requete = $connexion->prepare($sql);
+
+		  $requete->bindParam(':matricule', $matricule, PDO::PARAM_STR, 7);
+		  $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+		  $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+
+		  $resultat = $requete->execute();
+		  $abonne = Null;
+		  if ($resultat) {
+			  $ligne = $requete->fetch();
+			  $abonne = $ligne['user'];
+		  }
+
+		  Application::deconnexionPDO($connexion);
+
+		  return ($abonne == $matricule);
+	  }
+
+	  /**
+	   * Résilie l'abonnement par l'utilisateur $acronyme au $idSujet dans $idCategorie
+	   *
+	   * @param string $acronyme
+	   * @param int $idCatgorie
+	   * @param int $idSujet
+	   *
+	   * @return void
+	   */
+	   public function desAbonnement($matricule, $idCategorie, $idSujet){
+		   $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		   $sql = 'DELETE FROM '.PFX.'thotForumsSubscribe ';
+		   $sql .= 'WHERE user = :matricule AND idCategorie = :idCategorie AND idSujet = :idSujet ';
+		   $requete = $connexion->prepare($sql);
+
+		   $requete->bindParam(':matricule', $matricule, PDO::PARAM_STR, 7);
+		   $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+		   $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+
+		   $resultat = $requete->execute();
+
+		   $nb = $requete->rowCount();
+
+		   Application::deconnexionPDO($connexion);
+
+		   return ($nb);
+	   }
+
+	   /**
+		* renvoie la liste des abonnées au $idSujet de la $idCatgorie
+		*
+		* @param $idCategorie
+		* @param $idSujet
+		*
+		* @return array
+		*/
+		public function getListeAbonnes($idCategorie, $idSujet) {
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+			$sql = 'SELECT subscr.user, de.nom AS nomEleve, de.prenom AS prenomEleve, de.groupe, ';
+			$sql .= 'CONCAT(pwd.user,"@", mailDomain) AS mailEleve, ';
+			$sql .= 'profs.nom AS nomProf, profs.prenom AS prenomProf, profs.sexe, profs.mail AS mailProf ';
+			$sql .= 'FROM '.PFX.'thotForumsSubscribe AS subscr ';
+			$sql .= 'LEFT JOIN '.PFX.'eleves AS de ON de.matricule = user ';
+			$sql .= 'LEFT JOIN '.PFX.'profs AS profs ON profs.acronyme = user ';
+			$sql .= 'LEFT JOIN '.PFX.'passwd AS pwd ON pwd.matricule = de.matricule ';
+			$sql .= 'WHERE idCategorie = :idCategorie AND idSujet = :idSujet ';
+			$requete = $connexion->prepare($sql);
+
+			$requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+			$requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+
+			$liste = array();
+			$resultat = $requete->execute();
+
+			if ($resultat) {
+				$requete->setFetchMode(PDO::FETCH_ASSOC);
+				while ($ligne = $requete->fetch()) {
+					$user = $ligne['user'];
+					$liste[$user] = $ligne;
+				}
+			}
+
+			Application::deconnexionPDO($connexion);
+
+			return $liste;
+		}
 
     /**
      * enregistrement d'un post ÉDITÉ $postId sur le sujet $idSujet dans la catégorie $idCategorie

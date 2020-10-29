@@ -217,7 +217,7 @@ class Files
         $sql .= "WHERE destinataire = :matricule ";
         $sql .= "OR (groupe = :classe AND destinataire = 'all') ";
         $sql .= "OR groupe IN ($listeCoursString) AND (destinataire = 'all') ";
-        $sql .= "OR (groupe = :niveau ) ";
+        $sql .= "OR (groupe = '$niveau') ";
         $sql .= "OR groupe = 'ecole' ";
         $requete = $connexion->prepare($sql);
 

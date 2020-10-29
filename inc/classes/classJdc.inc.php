@@ -22,29 +22,19 @@ class Jdc
      *
      * @return array
      */
-    public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString, $redacteur=Null)
+    public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCou    rsString, $redacteur=Null)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, enonce, class, allDay, startDate, endDate ';
+        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, enonce, class, allDay, startDate, endD    ate ';
         $sql .= 'FROM '.PFX.'thotJdc ';
         $sql .= 'WHERE startDate BETWEEN :start AND :end ';
-        if ($redacteur == Null) {
-            $sql .= "AND destinataire in ($listeCoursString) OR destinataire = :classe ";
-            $sql .= "OR destinataire = :matricule OR destinataire = 'all' OR destinataire = :niveau ";
-        }
-        else {
-            $sql .= 'AND redacteur = :redacteur ';
-        }
+        $sql .= "AND destinataire in ($listeCoursString) OR destinataire = :classe ";
+        $sql .= "OR destinataire = :matricule OR destinataire = 'all'  OR destinataire = '$niveau' ";
         $requete = $connexion->prepare($sql);
 
-        if ($redacteur == Null) {
-            $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
-            $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
-            $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
-        }
-        else {
-            $requete->bindParam(':redacteur', $redacteur, PDO::PARAM_INT);
-        }
+        $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+//            $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
         $requete->bindParam(':start', $start, PDO::PARAM_STR, 20);
         $requete->bindParam(':end', $end, PDO::PARAM_STR, 20);
 
@@ -168,7 +158,7 @@ class Jdc
 
         return $liste;
     }
-    
+
         /**
      * retrouve la liste des événements personnels partagés avec l'utilisateur
      *
@@ -385,7 +375,7 @@ class Jdc
 
         return $travail;
     }
-    
+
     /**
      * retrouve les informations sur le RV de coaching dont on fournit l'identifiant
      *
@@ -837,7 +827,7 @@ class Jdc
 
         return $resultat;
     }
-    
+
 
     /**
      * retourne l'image en base64 de l'horaire de l'élève $matricule depuis le répertoire $directory
