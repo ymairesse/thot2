@@ -114,26 +114,28 @@ i.fav, i.favori {
     </div>
 
 
+
     <div id="cours" class="tab-pane fade" style="min-height:30em; overflow:auto;">
         <h3>Les documents pour mes cours</h3>
 
         {if isset($listeDocs.coursGrp)}
 
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-            {foreach from=$listeDocs.coursGrp key=libelle item=data name=boucle}
-            {assign var=shareId value=$data.shareId}
-            <li {if $smarty.foreach.boucle.iteration==1 }class="active"{/if}>
-                <a href="#{$libelle|replace:' ':'_'}" data-toggle="tab">
+            {foreach from=$listeDocs.coursGrp key=libelle item=dataBranche name=boucle}
+            <li {if $smarty.foreach.boucle.iteration == 1 }class="active"{/if}>
+	        <a href="#{$libelle|regex_replace:'/[^a-zA-Z]/':''}" data-toggle="tab">
                     {$libelle} <span class="badge">{$listeDocs.coursGrp.$libelle|count}</span>
                 </a>
-            </li>
+	        </li>
             {/foreach}
         </ul>
 
         <div class="tab-content">
 
             {foreach from=$listeDocs.coursGrp key=libelle item=dataBranche name=boucle}
-                <div class="tab-pane{if $smarty.foreach.boucle.iteration == 1} active{/if}" id="{$libelle|replace:' ':'_'}">
+
+                <div class="tab-pane{if $smarty.foreach.boucle.iteration == 1} active{/if}"
+	             id="{$libelle|regex_replace:'/[^a-zA-Z]/':''}">
 
                     <table class="table table-condensed">
                         <thead>
@@ -150,7 +152,8 @@ i.fav, i.favori {
                         <tr data-shareid="{$dataDoc.shareId}">
                             <td>
                                 {if $dataDoc.dirOrFile == 'file'}
-                                <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
+                                <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a>
+				 {else}
                                 <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$dataDoc.commentaire}">
                                     <i class="fa fa-folder-open"></i> Dossier: {$dataDoc.commentaire|truncate:40}
                                 </button>
