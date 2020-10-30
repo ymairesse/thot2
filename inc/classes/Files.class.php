@@ -223,7 +223,7 @@ class Files
 
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 8);
-        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+        // $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
 
         $resultat = $requete->execute();
         $liste = array();
