@@ -11,26 +11,21 @@ if (!(isset($_SESSION[APPLICATION]))) {
     exit;
 }
 
+// définition de la class USER utilisée en variable de SESSION
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
-
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
 $idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
-$fileName = isset($_POST['fileName']) ? $_POST['fileName'] : Null;
 
-$dataTravail = $Files->getDetailsTravail($idTravail, $matricule);
-$acronyme = $dataTravail['acronyme'];
+$listeCotesTravail = $Files->getCotesTravail ($idTravail, $matricule);
 
-$ds = DIRECTORY_SEPARATOR;
-// chemin complet vers le fichier (l'utilisateur courant ne peut effacer que des fichiers dans le répertoire $matricule)
-$path = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule.$ds.$fileName;
+$nbCotes = 0;
+foreach ($listeCotesTravail as $idCompetence => $data) {
+    $nbCotes += trim($data['cote']) != '' ? 1 : 0;
+}
 
-if (@unlink($path)) {
-    $nb = $Files->ajusteDocumentsRemis($idTravail, $matricule, -1);
-    echo $idTravail;
-    }
-    else echo -1;
+echo $nbCotes;

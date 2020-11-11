@@ -22,12 +22,10 @@ $Files = new Files();
 $idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
 $fileName = isset($_POST['fileName']) ? $_POST['fileName'] : Null;
 
-
 require_once '../../smarty/Smarty.class.php';
 $smarty = new Smarty();
 $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
-
 
 if ($Files->verifEleve4Travail($matricule, $idTravail)) {
     $details = $Files->getDetailsTravail($idTravail, $matricule);

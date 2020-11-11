@@ -38,11 +38,10 @@ if (!empty($_FILES) && ($verif == true)) {
         mkdir($targetPath, 0700, true);
 		}
     if (move_uploaded_file($tempFile, $targetFile)) {
-        $Files->travailRemis($idTravail, $matricule);
+        $Files->ajusteDocumentsRemis($idTravail, $matricule, +1);
         return true;
 		}
     else {
-        $Files->travailRemis($idTravail, $matricule, false);
         return false;
     }
 

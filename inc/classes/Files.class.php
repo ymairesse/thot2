@@ -481,7 +481,37 @@ class Files
     }
 
     /**
-     * retourne les cotes par compétence pour un travail dont on fournit le 'idTravail' pour l'élève $matricule
+    * ajuste le nombre de documents remis pour le travail $idTravail de l'élève $matricule
+    *
+    * @param int $idTravail
+    * @param int $matricule
+    * @param int $addSub +1 (pour ajout d'un doc) ou -1 (pour delete d'un doc)
+    *
+    * @return int nombre de documents ajoutés / supprimés
+    */
+    public function ajusteDocumentsRemis($idTravail, $matricule, $addSub){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'UPDATE '.PFX.'thotTravauxRemis ';
+        $sql .= 'SET remis = remis + :addSub ';
+        $sql .= 'WHERE idTravail = :idTravail AND matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindValue(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindValue(':idTravail', $idTravail, PDO::PARAM_INT);
+        $requete->bindValue(':addSub', $addSub, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+
+        $nb = $requete->rowCount();
+
+        Application::DeconnexionPDO($connexion);
+
+        $n = $nb * $addSub;
+        
+        return $n;
+    }
+
+     /** retourne les cotes par compétence pour un travail dont on fournit le 'idTravail' pour l'élève $matricule
      *
      * @param int $idTravail
      * @param int $matricule : matricule de l'élève
