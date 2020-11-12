@@ -89,13 +89,25 @@ function eraseCookie(name) {
         $('#detailsTravail').on('click', '.btn-delFile', function(){
             var idTravail = $(this).data('idtravail');
             var fileName = $(this).data('filename');
-            $.post('inc/casiers/verifFileName.inc.php', {
-                idTravail: idTravail,
-                fileName: fileName
-            },
-            function(resultat){
-                $('#modal').html(resultat);
-                $('#modalDelFile').modal('show');
+            $.post('inc/casiers/verifCoteAttribuee.inc.php', {
+                idTravail: idTravail
+            }, function(resultat){
+                if (resultat == 0){
+                    $.post('inc/casiers/verifFileName.inc.php', {
+                        idTravail: idTravail,
+                        fileName: fileName
+                    },
+                    function(resultat){
+                        $('#modal').html(resultat);
+                        $('#modalDelFile').modal('show');
+                    })
+                }
+                else {
+                    bootbox.alert({
+                        title: 'Effacer le document',
+                        message: 'Le travail a été évalué. Il n\'est plus possible d\'effacer ce document'
+                    })
+                }
             })
         })
 
@@ -195,7 +207,7 @@ function eraseCookie(name) {
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
         maxFiles: nbFichiersMax,
-        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3,.otp",
+        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3,.otp,.mp3,.m4a",
         url: "inc/upload.inc.php",
         accept: function(file, done) {
             done();
