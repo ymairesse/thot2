@@ -242,5 +242,4 @@ function eraseCookie(name) {
         }
     }
 
-
 </script>
