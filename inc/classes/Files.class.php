@@ -507,7 +507,7 @@ class Files
         Application::DeconnexionPDO($connexion);
 
         $n = $nb * $addSub;
-        
+
         return $n;
     }
 
@@ -520,13 +520,14 @@ class Files
      */
     public function getCotesTravail ($idTravail, $matricule){
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT idCompetence, max, formCert, libelle, "-" AS cote ';
+        $sql = 'SELECT idCompetence, max, formCert, libelle, "" AS cote ';
         $sql .= 'FROM '.PFX.'thotTravauxCompetences AS ttc ';
         $sql .= 'JOIN '.PFX.'bullCompetences AS bc ON bc.id = ttc.idCompetence ';
         $sql .= 'WHERE idTravail =:idTravail ';
         $requete = $connexion->prepare($sql);
 
         $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+
         $resultat = $requete->execute();
 
         $liste = array();
