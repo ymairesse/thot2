@@ -15,7 +15,7 @@
     </div>
 
     <div class="panel-body">
-        <p>Le <strong>{$travail.startDate} xxx</strong> de <strong>{$travail.heureDebut}</strong>{if isset($travail.heureFin)} à <strong>{$travail.heureFin}</strong>{/if} Durée: <strong>{$travail.duree}' </strong></p>
+        <p>Le <strong>{$travail.startDate} </strong> de <strong>{$travail.heureDebut}</strong>{if isset($travail.heureFin)} à <strong>{$travail.heureFin}</strong>{/if} Durée: <strong>{$travail.duree}' </strong></p>
         {if $travail.libelle != ''}
             <p>{$travail.libelle} {$travail.nbheures}h [{$travail.destinataire}]</p>
             {elseif $travail.type == 'classe'}
