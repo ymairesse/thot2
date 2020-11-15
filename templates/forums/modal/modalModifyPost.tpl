@@ -9,12 +9,24 @@
       </div>
       <div class="modal-body">
           <form id="formModalModify">
+
               <label for="myPost">Ma contribution</label>
               <textarea name="myPost" id="myPost" rows="5" class="form-control">{$postAncien.post}</textarea>
               <input type="hidden" name="postId" id="postId" value="{$postAncien.postId}">
               <input type="hidden" name="idSujet" id="idSujet" value="{$postAncien.idSujet}">
               <input type="hidden" name="idCategorie" id="idCategorie" value="{$postAncien.idCategorie}">
 
+              <div class="col-xs-3">
+                  <div class="checkbox">
+                      <label><input type="checkbox" name="subscribe" value="1"{if $isAbonne} checked{/if}>Je m'abonne à ce sujet</label>
+                  </div>
+              </div>
+              <div class="col-xs-9">
+                   <p class="discret"><i class="fa fa-info-circle"></i> Abonne-toi pour recevoir un avertissement sur ton adresse mail scolaire à chaque contribution à ce sujet.</p>
+              </div>
+
+              <div class="clearfix"></div>
+              
           </form>
       </div>
       <div class="modal-footer">

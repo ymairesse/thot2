@@ -31,9 +31,23 @@
                     </label>
                     <textarea name="myPost" id="myPost" rows="5" class="form-control"></textarea>
 
+                    <div class="col-xs-3">
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="subscribe" value="1"{if $isAbonne} checked{/if}>Je m'abonne à ce sujet</label>
+                        </div>
+                    </div>
+                    <div class="col-xs-9">
+                         <p class="discret"><i class="fa fa-info-circle"></i> Abonne-toi pour recevoir un avertissement sur ton adresse mail scolaire à chaque contribution à ce sujet.</p>
+                    </div>
+
+
                     <input type="hidden" name="postId" id="postId" value="{$postAncien.postId}">
                     <input type="hidden" name="idSujet" id="idSujet" value="{$postAncien.idSujet}">
                     <input type="hidden" name="idCategorie" id="idCategorie" value="{$postAncien.idCategorie}">
+
+                    <div class="clearfix">
+
+                    </div>
 
                 </form>
             </div>
@@ -49,6 +63,36 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+
+
+            function sendFile(file, el) {
+                var form_data = new FormData();
+                form_data.append('file', file);
+                $.ajax({
+                    data: form_data,
+                    type: "POST",
+                    url: 'editor-upload.php',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(url) {
+                        $(el).summernote('editor.insertImage', url);
+                    }
+                });
+            }
+
+            function deleteFile(src) {
+                console.log(src);
+                $.ajax({
+                    data: { src : src },
+                    type: "POST",
+                    url: 'inc/deleteImage.inc.php',
+                    cache: false,
+                    success: function(resultat) {
+                        console.log(resultat);
+                        }
+                } );
+            }
 
         $('#resetNewPost').click(function() {
             $('#myPost').val('');
@@ -71,6 +115,18 @@
               ['view', ['fullscreen', 'codeview', 'help']],
             ],
             maximumImageFileSize: 524288,
+            callbacks: {
+                onImageUpload: function(files, editor, welEditable) {
+                    console.log('test');
+                    for (var i = files.length - 1; i >= 0; i--) {
+                        sendFile(files[i], this);
+                    }
+                },
+                onMediaDelete : function(target) {
+                    console.log(target);
+                    deleteFile(target[0].src);
+                }
+            }
 		});
 
         $('#formModalAnswer').validate({

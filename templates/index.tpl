@@ -40,7 +40,7 @@
 
 	<link rel="stylesheet" href="fc2/fullcalendar.css" media="screen">
 	<link rel="stylesheet" href="css/animate/animate.min.css">
-	
+
 	<link rel="stylesheet" href="summernote/summernote.min.css">
 	<script src="summernote/summernote.min.js"></script>
 	<script src="summernote/lang/summernote-fr-FR.min.js"></script>
@@ -49,15 +49,15 @@
 
 <body>
 	<div class="container-fluid">
-		
+
 		{include file="entete.tpl"}
 		{include file="menu.tpl"}
 
 		{if isset($selecteur)}
 			{include file="$selecteur.tpl"}
 		{/if}
-		
-					{if (isset($message))}
+
+	{if (isset($message))}
 	<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 		{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">
 		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -81,7 +81,7 @@
 	{include file="footer.tpl"}
 
 	<script type="text/javascript">
-		
+
 		window.setTimeout(function() {
     $(".auto-fadeOut").fadeTo(500, 0).slideUp(500, function(){
         $(this).remove();

@@ -42,8 +42,14 @@
 				</ul>
 			</li>
 
-			<li>
-				<a href="index.php?action=forums"><i class="fa fa-comment" style="color:#cc0"></i> Forums</a>
+			<li class="dropdown">
+				<a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)" id="menuForum">
+					<i class="fa fa-comment" style="color:#cc0"></i> Forums<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="index.php?action=forums&amp;mode=forum" id="linkForum">Accéder aux forums</a></li>
+					<li><a href="index.php?action=forums&amp;mode=gestion">Gérer mes abonnements</a></li>
+				</ul>
 			</li>
 
 			{if $userType == 'eleve'}
