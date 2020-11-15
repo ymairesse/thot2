@@ -29,12 +29,12 @@ class Jdc
         $sql .= 'FROM '.PFX.'thotJdc ';
         $sql .= 'WHERE startDate BETWEEN :start AND :end ';
         $sql .= "AND destinataire in ($listeCoursString) OR destinataire = :classe ";
-        $sql .= "OR destinataire = :matricule OR destinataire = 'all'  OR destinataire = '$niveau' ";
+        $sql .= "OR destinataire = :matricule OR destinataire = 'all'  OR destinataire LIKE :niveau ";
         $requete = $connexion->prepare($sql);
 
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
-//            $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+        $requete->bindParam(':niveau', $niveau, PDO::PARAM_STR, 1);
         $requete->bindParam(':start', $start, PDO::PARAM_STR, 20);
         $requete->bindParam(':end', $end, PDO::PARAM_STR, 20);
 
@@ -71,8 +71,8 @@ class Jdc
     /**
      * retrouve la liste des remédiations entre deux dates destinées à un élève dont on fournit le matricule
      *
-     * @param $start date de début
-     * @param $end date de fin
+     * @param string $start date de début
+     * @param string $end date de fin
      * @param int $matricule
      *
      * @return array
