@@ -25,6 +25,8 @@ $postId = isset($_POST['postId']) ? $_POST['postId'] : Null;
 require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
 $Forum = new ThotForum();
 
+$isAbonne = $Forum->getAbonnement($matricule, $idCategorie, $idSujet);
+
 if ($postId != 0) {
     // c'est une réponse à un post précédent
     $postAncien = $Forum->getInfoPost($idCategorie, $idSujet, $postId);
@@ -44,4 +46,6 @@ $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
 $smarty->assign('postAncien', $postAncien);
+$smarty->assign('isAbonne', $isAbonne);
+
 $smarty->display('forums/modal/modalAnswerPost.tpl');

@@ -1,4 +1,3 @@
-
 <div class="row">
 
     <div class="col-md-3 col-xs-12" style="min-height:15em; overflow: auto;" id="listeSujets">
@@ -153,6 +152,11 @@
                     formulaire: formulaire
                 }, function(resultat){
                     $('.btn-sujet[data-idcategorie="' + idCategorie + '"][data-idsujet="' + idSujet + '"]').trigger('click');
+                    // envoi des notifications éventuelels par mail
+                    $.post('inc/forums/mail4NewPost.inc.php', {
+                        formulaire: formulaire
+                    }, function(){
+                    });
                     $('#modalAnswerPost').modal('hide');
                 })
             }

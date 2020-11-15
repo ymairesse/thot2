@@ -28,12 +28,16 @@ $idSujet = isset($form['idSujet']) ? $form['idSujet'] : Null;
 $postId = isset($form['postId']) ? $form['postId'] : Null;
 $myPost = isset($form['myPost']) ? $form['myPost'] : Null;
 
+// abonnement ou désabonnement à ce sujet
+$isAbonne = isset($form['subscribe']) ? $form['subscribe'] : Null;
+
 require_once INSTALL_DIR.'/inc/classes/classEcole.inc.php';
 $Ecole = new Ecole();
 
 // vérifier que l'élève est invité sur ce sujet
-$listeCoursGrp = array_reverse($Ecole->getListeCoursGrp4eleve($matricule));
-$listeMatieres = $Ecole->getListeMatieresEleve(array_keys($listeCoursGrp));
+$listeCoursGrp = $Ecole->getListeCoursGrp4eleve($matricule);
+$listeCoursGrp = isset($listeCoursGrp) ? array_reverse($listeCoursGrp) : Null;
+$listeMatieres = isset($listeCoursGrp) ? $Ecole->getListeMatieresEleve(array_keys($listeCoursGrp)) : Null;
 
 require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
 $Forum = new ThotForum();
@@ -50,5 +54,11 @@ if ($okAcces && $okPost) {
 	// convertir les balises http(s) en vrais liens cliquables
 	$myPost = preg_replace('$(\s|^)(https?://[a-z0-9_./?=&#\$-]+)(?![^<>]*>)$i', ' <a href="$2" target="_blank">$2</a>', $myPost." ");
     $newPostId = $Forum->saveNewPost($myPost, $idSujet, $idCategorie, $postId, $matricule);
+
+    // enregistrement éventuel de l'abonnement
+    if ($isAbonne != Null)
+        $Forum->setAbonnement($matricule, $idCategorie, $idSujet);
+        else $Forum->desAbonnement($matricule, $idCategorie, $idSujet);
+
     echo $newPostId;
 }

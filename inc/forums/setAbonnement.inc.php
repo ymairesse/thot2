@@ -16,25 +16,22 @@ require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
 
 $matricule = $User->getMatricule();
+$classe = $User->getClasse();
+$niveau = substr($classe, 0, 1);
 
 $idCategorie = isset($_POST['idCategorie']) ? $_POST['idCategorie'] : Null;
 $idSujet = isset($_POST['idSujet']) ? $_POST['idSujet'] : Null;
-$postId = isset($_POST['postId']) ? $_POST['postId'] : Null;
+$checked = isset($_POST['checked']) ? $_POST['checked'] : Null;
 
-// définition de la class Forum
-require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
-$Forum = new ThotForum();
+$ds = DIRECTORY_SEPARATOR;
+require_once INSTALL_DIR.$ds.$module.$ds.'inc/classes/class.thotForum.php';
+$Forum = new thotForum();
 
-$postAncien = $Forum->getInfoPost($idCategorie, $idSujet, $postId);
-
-$isAbonne = $Forum->getAbonnement($matricule, $idCategorie, $idSujet);
-
-require_once INSTALL_DIR.'/smarty/Smarty.class.php';
-$smarty = new Smarty();
-$smarty->template_dir = '../../templates';
-$smarty->compile_dir = '../../templates_c';
-
-$smarty->assign('postAncien', $postAncien);
-$smarty->assign('isAbonne', $isAbonne);
-
-$smarty->display('forums/modal/modalModifyPost.tpl');
+if ($checked == 'true') {
+    $Forum->setAbonnement($matricule, $idCategorie, $idSujet);
+    echo "abonné·e à";
+    }
+    else {
+        $Forum->desAbonnement($matricule, $idCategorie, $idSujet);
+        echo "<strong>dés</strong>abonné·e de";
+    }

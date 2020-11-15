@@ -54,7 +54,7 @@ class ThotForum
 
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 7);
-        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+        // $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
 
         $liste = Null;
         $resultat = $requete->execute();
@@ -603,6 +603,43 @@ class ThotForum
 
 			return $liste;
 		}
+
+	/**
+         * renvoie la liste des abonnements de l'élève $matricule
+         *
+         * @param int $matricule
+         *
+         * @return array
+         */
+         public function getListeAbonnements($matricule) {
+ 			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+            $sql = 'SELECT count(sujet) AS nbPosts, subscr.idCategorie, subscr.idSujet, libelle, sujet, user ';
+            $sql .= 'FROM '.PFX.'thotForumsSubscribe AS subscr JOIN didac_thotForums AS forums ON forums.idCategorie = subscr.idCategorie ';
+            $sql .= 'JOIN '.PFX.'thotForumsSujets AS sujet ON sujet.idCategorie = subscr.idCategorie AND sujet.idSujet = subscr.idSujet ';
+            $sql .= 'JOIN '.PFX.'thotForumsPosts AS posts ON sujet.idCategorie = posts.idCategorie AND sujet.idSujet = posts.idSujet ';
+            $sql .= 'WHERE user = :user ';
+            $sql .= 'GROUP BY idCategorie, idSujet ';
+
+ 			$requete = $connexion->prepare($sql);
+
+ 			$requete->bindParam(':user', $matricule, PDO::PARAM_INT);
+
+ 			$liste = array();
+ 			$resultat = $requete->execute();
+
+ 			if ($resultat) {
+ 				$requete->setFetchMode(PDO::FETCH_ASSOC);
+ 				while ($ligne = $requete->fetch()) {
+                    $idCategorie = $ligne['idCategorie'];
+ 					$idSujet = $ligne['idSujet'];
+ 					$liste[$idCategorie][$idSujet] = $ligne;
+ 				}
+ 			}
+
+ 			Application::deconnexionPDO($connexion);
+
+ 			return $liste;
+ 		}
 
     /**
      * enregistrement d'un post ÉDITÉ $postId sur le sujet $idSujet dans la catégorie $idCategorie

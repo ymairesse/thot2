@@ -28,12 +28,18 @@ $idSujet = isset($form['idSujet']) ? $form['idSujet'] : Null;
 $postId = isset($form['postId']) ? $form['postId'] : Null;
 $myPost = isset($form['myPost']) ? $form['myPost'] : Null;
 
+$isAbonne = isset($form['subscribe']) ? $form['subscribe'] : Null;
+
 require_once INSTALL_DIR.'/inc/classes/classEcole.inc.php';
 $Ecole = new Ecole();
 
-// vérifier que l'élève est invité sur ce sujet
-$listeCoursGrp = array_reverse($Ecole->getListeCoursGrp4eleve($matricule));
-$listeMatieres = $Ecole->getListeMatieresEleve(array_keys($listeCoursGrp));
+// vérifier que l'élève est invité sur ce sujet pour un de ses cours ou pour une matière
+$listeCoursGrp = $Ecole->getListeCoursGrp4eleve($matricule);
+if ($listeCoursGrp != Null) {
+    $listeCoursGrp = array_reverse($listeCoursGrp);
+    $listeMatieres = $Ecole->getListeMatieresEleve(array_keys($listeCoursGrp));
+    }
+    else $listeMatieres = Null;
 
 require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
 $Forum = new ThotForum();
@@ -46,5 +52,8 @@ $myPost = preg_replace('$(\s|^)(https?://[a-z0-9_./?=&-]+)(?![^<>]*>)$i', ' <a h
 
 if ($okAcces) {
     $postId = $Forum->saveEditedPost($myPost, $idSujet, $idCategorie, $postId);
+    if ($isAbonne != Null)
+        $Forum->setAbonnement($matricule, $idCategorie, $idSujet);
+        else $Forum->desAbonnement($matricule, $idCategorie, $idSujet);
     echo $postId;
 }

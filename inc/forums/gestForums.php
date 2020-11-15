@@ -25,7 +25,22 @@ $listeTypes = array(
 );
 $smarty->assign('listeTypes', $listeTypes);
 
-$listeSujets = $Forum->getListeSujets4eleve($matricule, $classe, $niveau, $listeMatieres, $listeCoursGrp);
-$smarty->assign('listeSujets', $listeSujets);
-// Application::afficher($listeSujets);
-$smarty->assign('corpsPage', 'forums/forums');
+switch ($mode) {
+    case 'forum':
+        $listeSujets = $Forum->getListeSujets4eleve($matricule, $classe, $niveau, $listeMatieres, $listeCoursGrp);
+        $smarty->assign('listeSujets', $listeSujets);
+        $smarty->assign('corpsPage', 'forums/forums');
+        break;
+
+    case 'gestion':
+        $listeAbonnements = $Forum->getListeAbonnements($matricule);
+        $listeCategories = array();
+        foreach ($listeAbonnements as $idCategorie => $data) {
+            $listeCategories[$idCategorie] = $Forum->getInfoCategorie($idCategorie);
+        }
+
+        $smarty->assign('listeAbonnements', $listeAbonnements);
+        $smarty->assign('listeCategories', $listeCategories);
+        $smarty->assign('corpsPage', 'forums/gestAbonnements');
+        break;
+}
