@@ -29,7 +29,7 @@ class Jdc
         $sql .= 'FROM '.PFX.'thotJdc ';
         $sql .= 'WHERE startDate BETWEEN :start AND :end ';
         $sql .= "AND destinataire in ($listeCoursString) OR destinataire = :classe ";
-        $sql .= "OR destinataire = :matricule OR destinataire = 'all'  OR destinataire LIKE :niveau ";
+        $sql .= "OR destinataire = :matricule OR destinataire = 'ecole'  OR destinataire LIKE :niveau ";
         $requete = $connexion->prepare($sql);
 
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
