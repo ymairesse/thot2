@@ -2547,7 +2547,7 @@ class Bulletin
 
         return $listeNotes;
     }
-    
+
       /**
      * renvoie les informations de remarques sur le parcours scolaire pour un élève
      * dont on founit le matricule pour l'année d'étude en cours (si précisé)
@@ -3293,15 +3293,17 @@ class Bulletin
         if ($resultat) {
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $requete->fetch()) {
-                $coursGrp = $ligne['coursGrp'];
-                $bulletin = $ligne['bulletin'];
-                $ligne['date'] = Application::datePHP($ligne['date']);
-                if (($ligne['max'] > 0) && ($ligne['cote'] != '') && (!in_array($ligne['cote'], explode(',', COTEABS)))) {
-                    $ligne['echec'] = ($ligne['cote'] / $ligne['max']) < 0.5;
-                } else {
-                    $ligne['echec'] = false;
+                if (trim($ligne['cote']) != ''){
+                    $coursGrp = $ligne['coursGrp'];
+                    $bulletin = $ligne['bulletin'];
+                    $ligne['date'] = Application::datePHP($ligne['date']);
+                    if (($ligne['max'] > 0) && ($ligne['cote'] != '') && (!in_array($ligne['cote'], explode(',', COTEABS)))) {
+                        $ligne['echec'] = ($ligne['cote'] / $ligne['max']) < 0.5;
+                    } else {
+                        $ligne['echec'] = false;
+                    }
+                    $liste[$coursGrp][$bulletin][] = $ligne;
                 }
-                $liste[$coursGrp][$bulletin][] = $ligne;
             }
         }
 
