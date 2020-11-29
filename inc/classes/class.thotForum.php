@@ -46,7 +46,7 @@ class ThotForum
         $sql .= 'JOIN '.PFX.'thotForums AS forums ON forums.idCategorie = access.idCategorie ';
         $sql .= 'JOIN '.PFX.'thotForumsSujets AS sujets ON sujets.idCategorie = access.idCategorie AND sujets.idSujet = access.idSujet ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = sujets.acronyme ';
-		$sql .= 'WHERE userStatus = "eleves" AND cible IN ("all", :matricule, :classe, "$niveau", '.$listeMatieresString.','.$listeCoursGrpString.') ';
+		$sql .= 'WHERE userStatus = "eleves" AND cible LIKE :niveau OR cible IN ("all", :matricule, :classe, '.$listeMatieresString.', '.$listeCoursGrpString.') ';
         $sql .= 'AND forumActif = 1 ';
         $sql .= 'ORDER BY cible ';
 
@@ -54,7 +54,7 @@ class ThotForum
 
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 7);
-        // $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
 
         $liste = Null;
         $resultat = $requete->execute();
