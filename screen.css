@@ -663,7 +663,7 @@ div.treeview ul:first-child:before, .treeviewPost ul:first-children:before {
 .treeview li, .treeviewPost li {
     margin:0;
     padding:0 0 0 1em;
-    line-height:2em;
+    line-height: 1em;
     position:relative;
 }
 

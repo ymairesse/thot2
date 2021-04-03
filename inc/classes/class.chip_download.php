@@ -68,7 +68,8 @@ class chip_download
             /* Audio */
             'mp3' => 'audio/mpeg',
 			'wav'	=> 'audio/x-wav',
-			
+            'm4a'   => 'audio/m4a',
+
 			/* Geogebra */
             'ggb' => 'application/vnd.geogebra.file',
 

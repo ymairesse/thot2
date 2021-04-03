@@ -360,7 +360,7 @@ class Application
     {
         switch ($userType) {
             case 'eleve':
-                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement', 'forums');
+                $permis = array('bulletin', 'repertoire', 'remediation', 'help', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement', 'forums');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -996,6 +996,9 @@ class Application
         if ($mail == '') {
             $ok = false;
         }
+
+        $notifications = isset($post['notifications']) ? 1 : 0;
+
         $matricule = $post['matricule'];
         if ($matricule == '') {
             $ok = false;
@@ -1015,11 +1018,11 @@ class Application
             $userName = $userName.$matricule;
             $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
             $sql = 'INSERT INTO '.PFX.'thotParents ';
-            $sql .= 'SET userName=:userName, matricule=:matricule, formule=:formule, nom=:nomParent, prenom=:prenomParent, ';
-            $sql .= 'mail=:mail, lien=:lien, md5pwd=:passwd ';
+            $sql .= 'SET userName = :userName, matricule = :matricule, formule = :formule, nom = :nomParent, prenom = :prenomParent, ';
+            $sql .= 'mail = :mail, notifications = :notifications, lien = :lien, md5pwd = :passwd ';
             $sql .= 'ON DUPLICATE KEY UPDATE ';
-            $sql .= 'formule=:formule, nom=:nomParent, prenom=:prenomParent, ';
-            $sql .= 'mail=:mail, lien=:lien, md5pwd=:passwd ';
+            $sql .= 'formule = :formule, nom = :nomParent, prenom = :prenomParent, ';
+            $sql .= 'mail = :mail, lien = :lien, md5pwd = :passwd ';
             $requete = $connexion->prepare($sql);
             $data = array(
                     ':userName' => $userName,
@@ -1034,6 +1037,7 @@ class Application
                     ':nomParent' => $nomParent,
                     ':prenomParent' => $prenomParent,
                     ':mail' => $mail,
+                    ':notifications' => $notifications,
                     ':lien' => $lien,
                     ':passwd' => $passwd,
 
@@ -1051,9 +1055,9 @@ class Application
     /**
      * Enregistrement d'un profil modifié dans le formulaire ad-hoc.
      *
-     * @param $post : le contenu du formulaire
+     * @param array $post : le contenu du formulaire
      *
-     * @return bool
+     * @return int
      */
     public function saveProfilParent($post, $userName)
     {
@@ -1074,6 +1078,9 @@ class Application
         if ($mail == '') {
             $ok = false;
         }
+
+        $notifications = isset($post['notifications']) ? $post['notifications'] : Null;
+
         $lien = $post['lien'];
         if ($lien == '') {
             $ok = false;
@@ -1093,7 +1100,7 @@ class Application
         if ($ok == true) {
             $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
             $sql = 'UPDATE '.PFX.'thotParents ';
-            $sql .= 'SET formule = :formule, nom = :nom, prenom = :prenom, mail = :mail, lien = :lien ';
+            $sql .= 'SET formule = :formule, nom = :nom, prenom = :prenom, mail = :mail, notifications = :notifications, lien = :lien ';
             if (isset($md5pwd))
                 $sql .= ',md5pwd = :sqlPasswd ';
             $sql .= 'WHERE userName = :userName ';
@@ -1103,6 +1110,7 @@ class Application
             $requete->bindParam(':nom', $nom, PDO::PARAM_STR, 50);
             $requete->bindParam(':prenom', $prenom, PDO::PARAM_STR, 50);
             $requete->bindParam(':mail', $mail, PDO::PARAM_STR, 60);
+            $requete->bindParam(':notifications', $notifications, PDO::PARAM_INT);
             $requete->bindParam(':lien', $lien, PDO::PARAM_STR, 20);
             $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
 
@@ -2734,6 +2742,157 @@ class Application
         Application::deconnexionPDO($connexion);
 
         return $identite;
+    }
+
+    /**
+     * enregistrment des paramètres essentiels des demandes de soutien scolaire
+     *
+     * @param int $matricule
+     * @param string $GSM
+     * @param string $mail
+     * @param string $commentaire
+     *
+     * @return int : l'identifiant AI de l'enregistrement
+     */
+    public function saveDemandeEleve($matricule, $GSM, $mail, $commentaire){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'athenaEleves ';
+        $sql .= 'SET matricule = :matricule, GSM = :GSM, mail = :mail, commentaire = :commentaire ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':GSM', $GSM, PDO::PARAM_STR, 20);
+        $requete->bindParam(':mail', $mail, PDO::PARAM_STR, 60);
+        $requete->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
+
+        $resultat = $requete->execute();
+        if ($resultat)
+            $lastId = $connexion->lastInsertId();
+            else $lastId = Null;
+
+        Application::deconnexionPDO($connexion);
+
+        return $lastId;
+    }
+
+    /**
+     * enregistrement des objets des demandes de soutien de élèves
+     *
+     * @param int $id : identifiant de la demande dans la table didac_athenaEleves
+     * @param array $listeObjets
+     *
+     * @return int
+     */
+    public function saveObjetDemandeEleve($id, $listeObjets){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'athenaElevesObjet ';
+        $sql .= 'SET id = :id, objet = :objet ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+
+        $n = 0;
+        foreach ($listeObjets as $objet) {
+            $requete->bindParam(':objet', $objet, PDO::PARAM_STR, 15);
+            $resultat = $requete->execute();
+            if ($resultat)
+                $n++;
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $n;
+    }
+
+    /**
+     * enregistrement des médias pour les demandes de soutien des élèves
+     *
+     * @param int $id : ide
+     * @param array $listeMedias
+     *
+     * @return int
+     */
+    public function saveMediaDemandeEleve($id, $listeMedias) {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'athenaElevesMedia ';
+        $sql .= 'SET id = :id, media = :media ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+
+        $n = 0;
+        foreach ($listeMedias as $media) {
+            $requete->bindParam(':media', $media, PDO::PARAM_STR, 15);
+            $resultat = $requete->execute();
+            if ($resultat)
+                $n++;
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $n;
+    }
+
+    /**
+     * liste des demandes d'aide par l'élève $matricule
+     *
+     * @param int $matricule
+     *
+     * @return array
+     */
+    public function getDemandesAide($matricule){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT id, DATE_FORMAT(date, "%d/%m/%Y") AS laDate, SUBSTR(DATE_FORMAT(date, "%T"), 1, 5) AS heure, ';
+        $sql .= 'adopte, cache, sexe, nom, prenom ';
+        $sql .= 'FROM '.PFX.'athenaEleves AS athena ';
+        $sql .= 'LEFT JOIN '.PFX.'profs AS profs ON profs.acronyme = athena.adopte ';
+        $sql .= 'WHERE matricule = :matricule ';
+        $sql .= 'ORDER BY date ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $id = $ligne['id'];
+                if ($ligne['adopte'] != '') {
+                    $sexe = $ligne['sexe'];
+                    $adresse = ($sexe == 'F') ? 'Mme' : 'M.';
+                    $ligne['coach'] = sprintf('%s %s. %s', $adresse, mb_substr($ligne['prenom'], 0, 1, 'UTF-8'), $ligne['nom']);
+                    }
+                else $ligne['coach'] = Null;
+                $liste[$id] = $ligne;
+            }
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * cacher la demande d'aide $id
+     *
+     * @param int $id
+     *
+     * @return
+     */
+    public function hideDemande($id, $matricule) {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'UPDATE '.PFX.'athenaEleves ';
+        $sql .= 'SET cache = 1 ';
+        $sql .= 'WHERE id = :id AND matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+
+        Application::deconnexionPDO($connexion);
     }
 
 }

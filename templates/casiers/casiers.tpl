@@ -1,3 +1,4 @@
+{debug}
 <script src="dropzone/dropzone.js" charset="utf-8"></script>
 <link href="dropzone/dropzone.css" type="text/css" rel="stylesheet">
 
@@ -126,6 +127,7 @@ function eraseCookie(name) {
                     },
                     function(resultat){
                         $('#detailsTravail').html(resultat);
+                        nbFichiersMax++;
                     })
                 }
                 else bootbox.alert({
@@ -200,32 +202,36 @@ function eraseCookie(name) {
 
     })
 
-    var nbFichiersMax = 2;
+    // assignation initiale de la valeur de nbFichiersMax
+    {assign var=encore value=$detailsTravail.nbPJ-$detailsTravail.fileInfos|@count}
+    var nbFichiersMax = {$encore};
     var maxFileSize = 20;
     var erreur = false;
 
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
         maxFiles: nbFichiersMax,
-        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3,.otp,.mp3,.m4a",
+        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3,.otp,.mp3,.m4a,.wav",
         url: "inc/upload.inc.php",
         accept: function(file, done) {
             done();
         },
         init: function() {
             this.on("maxfilesexceeded", function(file) {
-                    alert("Pas plus de " + nbFichiersMax + " fichier(s) svp!");
+                    bootbox.alert({
+                        title: "Téléversement de fichiers",
+                        message: "Pas plus de " + nbFichiersMax + " fichier(s) s.t.p."
+                    })
                 }),
             this.on("sending", function(file, xhr, formData) {
                 var idTravail = $('.btnShowTravail.active').data('idtravail');
                 formData.append("idTravail", idTravail);
+                nbFichiersMax--;
             }),
             this.on("error", function(file, response) {
-                alert(response);
                 this.removeAllFiles(true);
                 }),
             this.on('success', function() {
-                // $('#callDropZone').hide().prop('disabled', true);
                 var idTravail = $('.btnShowTravail.active').data('idtravail');
                 $.post('inc/casiers/getDetailsTravail.inc.php',{
                     idTravail: idTravail

@@ -32,7 +32,8 @@
                 <div class="col-md-3 col-xs-12">
                     {* bouton dépôt ou pas? *}
                     {if ($detailsTravail.statut == 'readwrite') && ($detailsTravail.fileInfos|@count) < $detailsTravail['nbPJ']}
-                      <button type="button" class="btn btn-success btn-lg btn-block" id="callDropZone"><i class="fa fa-envelope-o fa-2x" style="float:left"></i> Déposer <br>un document (max {$detailsTravail.nbPJ})</button>
+                        {assign var=encore value=$detailsTravail.nbPJ-$detailsTravail.fileInfos|@count}
+                      <button type="button" class="btn btn-success btn-lg btn-block" id="callDropZone"><i class="fa fa-envelope-o fa-2x" style="float:left"></i> Déposer <br>un document (max {$encore})</button>
                       {else}
                       <p class="bg-danger">Le nombre maximum de documents joints à ce travail est atteint</p>
                     {/if}
