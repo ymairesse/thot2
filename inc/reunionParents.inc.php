@@ -4,7 +4,7 @@ $listeDates = $Application->listeDatesReunion(true);
 
 $smarty->assign('listeDates', $listeDates);
 if (count($listeDates) == 1) {
-    $idRP = current($listeDates);
+    $idRP = current($listeDates)['idRP'];
 } else {
     $idRP = isset($_POST['idRP']) ? $_POST['idRP'] : null;
 }
