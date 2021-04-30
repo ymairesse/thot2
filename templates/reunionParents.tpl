@@ -64,10 +64,8 @@
 
         {if $typeRP == 'profs'}
             {include file='reunionParents/selectRVRpProfs.tpl'}
-        {elseif $typeRP == 'titulaires'}
-            {include file='reunionParents/selectRVRpTitus.tpl'}
         {else}
-            {include file='reunionParents/selectRVRpCibles.tpl'}
+            {include file='reunionParents/selectRVRpTitus.tpl'}
         {/if}
 
     {else}
