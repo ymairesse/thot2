@@ -45,7 +45,11 @@
             <h3 class="panel-title">Prochaine réunion de parents</h3>
         </div>
         <div class="panel-body">
+            {if $listeDates != Null}
             <p>Veuillez sélectionner une date ci-dessus</p>
+            {else}
+            <p>Aucune date n'est actuellement fixée</p>
+            {/if}
         </div>
 
     </div>
@@ -54,17 +58,13 @@
 </div>
 <!-- col-md-... -->
 
-
-
-
-
 <div class="col-md-5 col-sm-12">
 
     {if isset($ACTIVE) && ($ACTIVE == 1) && ($OUVERT == 1) }
 
         {if $typeRP == 'profs'}
             {include file='reunionParents/selectRVRpProfs.tpl'}
-        {elseif $typeRP == 'titus'}
+        {elseif $typeRP == 'titulaires'}
             {include file='reunionParents/selectRVRpTitus.tpl'}
         {else}
             {include file='reunionParents/selectRVRpCibles.tpl'}
@@ -72,25 +72,23 @@
 
     {else}
 
-    <div class="panel panel-default">
+    <div class="panel panel-info">
 
         <div class="panel-heading">
             <h3 class="panel-title">Inscriptions à la réunion de parents</h3>
         </div>
         <div class="panel-body">
+            {if $listeDates != Null}
             <p>L'inscription n'est pas encore ouverte ou n'est plus ouverte</p>
+            {else}
+            <p>Aucune date n'est actuellement fixée</p>
+            {/if}
         </div>
 
     </div>
 
     {/if}
 </div>
-
-
-
-
-
-
 
 
 

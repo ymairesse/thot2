@@ -52,16 +52,12 @@ if (isset($idRP)) {
             $listeEncadrement = $Application->encadrement($listeProfsCours, $listeStatutsSpeciaux);
             $smarty->assign('listeEncadrement', $listeEncadrement);
             break;
-        case 'titus':
+        case 'titulaires':
             // ou seulement pour les titulaires?
             $listeEncadrement = $Application->listeTitulaires($matricule);
             $smarty->assign('listeEncadrement', $listeEncadrement);
             break;
-        case 'cible':
-            // ou pour seulement certains profs
-            $listeProfs = $Application->listeProfsCibles($idRP);
-            $smarty->assign('listeProfs', $listeProfs);
-            break;
+
         default:
             $smarty->assign('OUVERT', 0);
             $smarty->assign('ACTIVE', 0);
